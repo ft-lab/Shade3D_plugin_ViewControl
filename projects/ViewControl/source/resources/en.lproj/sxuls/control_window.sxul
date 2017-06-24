@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<palette xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../sxul.palettes.xsd" layout="true">
+	<vbox>
+		<control size='2 30'/>
+		<control size='200 4'/>
+		<popup-menu id="view_type" label="カメラの向き">
+			<item id="popup_item_0" label="透視図"/>
+			<item id="popup_item_1" label="上面"/>
+			<item id="popup_item_2" label="底面"/>
+			<item id="popup_item_3" label="正面"/>
+			<item id="popup_item_4" label="背面"/>
+			<item id="popup_item_5" label="右面"/>
+			<item id="popup_item_6" label="左面"/>
+		</popup-menu>
+		<control size='200 2'/>
+		<push-button id="set_eye_target_but" label="選択要素に注視点を合わせる" />
+		<control size='260 2'/>
+
+		<hbox>
+			<static-text id="camera_label" label="カメラ位置" size="80 16" />
+			<static-text id="camera_pos" label="dummy (xxxxxxxxx, xxxxxxxxx, xxxxxxxxx)" />
+		</hbox>
+		<hbox>
+			<static-text id="camera_target_label" label="カメラ注視点" size="80 16" />
+			<static-text id="camera_target" label="dummy (xxxxxxxxx, xxxxxxxxx, xxxxxxxxx)" />
+		</hbox>
+	</vbox>
+</palette>
