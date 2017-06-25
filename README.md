@@ -64,6 +64,10 @@ Xcode6.xで、ViewControl/mac/plugins/Template.xcodeprojを読み込みビルド
 
 * カメラ操作のUNDO/REDOには対応していません。
 
+## 既知の問題
+
+* カメラが平行投影の場合は、移動と回転の動きが速すぎる問題。
+
 ## 更新履歴
 
 [2017/06/25]  ver.1.0.0.0  
