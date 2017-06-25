@@ -39,16 +39,21 @@ CWindowIcon::CWindowIcon (sxsdk::window_interface &parent, const int type) : sxs
 	this->set_client_size(sx::vec<int,2>(24, 24));
 
 	// リソースからイメージを読み込み.
-	switch (m_type) {
-	case 0:
-		m_iconImage = shade.create_image_interface("move_icon_16x16");
-		break;
-	case 1:
-		m_iconImage = shade.create_image_interface("rotate_icon_16x16");
-		break;
-	case 2:
-		m_iconImage = shade.create_image_interface("zoom_icon_16x16");
-		break;
+	m_iconImage = NULL;
+	try {
+		switch (m_type) {
+		case 0:
+			m_iconImage = shade.create_image_interface("move_icon_16x16");
+			break;
+		case 1:
+			m_iconImage = shade.create_image_interface("rotate_icon_16x16");
+			break;
+		case 2:
+			m_iconImage = shade.create_image_interface("zoom_icon_16x16");
+			break;
+		}
+	} catch (...) {
+		m_iconImage = NULL;
 	}
 
 	m_pushF = false;
@@ -67,7 +72,9 @@ void CWindowIcon::paint (sxsdk::graphic_context_interface &gc, const sx::rectang
 	}
 
 	// アイコンを描画.
-	gc.draw_image(m_iconImage, sx::rectangle_class(sx::vec<int,2>(0, 0), size));
+	if (m_iconImage) {
+		gc.draw_image(m_iconImage, sx::rectangle_class(sx::vec<int,2>(0, 0), size));
+	}
 
 	// 外枠を描画.
 	{
@@ -334,13 +341,22 @@ void CControlWindowInterface::initialize (void *)
 {
 	set_trigger(sxsdk::enums::trigger_enum(sxsdk::enums::active_scene_changed));
 
+#if _WINDOWS
 	m_pMoveIcon   = new CWindowIcon(*this, 0);
 	m_pRotateIcon = new CWindowIcon(*this, 1);
 	m_pZoomIcon   = new CWindowIcon(*this, 2);
 
-	const int iconSize = 24;
-
 	load_sxul("control_window");
+#else
+	// load_sxulの後に、CWindowIconを生成しないと、Macの場合に追加コントロールが描画されない.
+	load_sxul("control_window");
+
+	m_pMoveIcon   = new CWindowIcon(*this, 0);
+	m_pRotateIcon = new CWindowIcon(*this, 1);
+	m_pZoomIcon   = new CWindowIcon(*this, 2);
+#endif
+
+	const int iconSize = 24;
 
 	this->set_client_size(get_layout_bounds().size());
 	this->set_title(CControlWindowInterface::name(&shade));
@@ -376,7 +392,7 @@ void CControlWindowInterface::idle (void *)
 void CControlWindowInterface::resize (int x, int y, bool remake, void *)
 {
 	if (!m_pMoveIcon) return;
-
+	
 	const int iconSize = 24;
 	sx::vec<int,2> p(8, 8);
 	m_pMoveIcon->set_client_rectangle(sx::rectangle_class(p, sx::vec<int,2>(p.x + iconSize, p.y + iconSize)));
@@ -558,6 +574,10 @@ void CControlWindowInterface::SetCameraWorldPos (const sxsdk::vec3& wPos)
 			lwMat = partC->get_local_to_world_matrix();
 		}
 		camera.set_eye(wPos * inv(lwMat));
+#if _WINDOWS
+#else
+		scene->force_update();	// 強制再描画.
+#endif
 	} catch (...) { }
 }
 
@@ -576,6 +596,10 @@ void CControlWindowInterface::SetCameraTargetWorldPos (const sxsdk::vec3& wPos)
 			lwMat = partC->get_local_to_world_matrix();
 		}
 		camera.set_target(wPos * inv(lwMat));
+#if _WINDOWS
+#else
+		scene->force_update();	// 強制再描画.
+#endif
 	} catch (...) { }
 }
 

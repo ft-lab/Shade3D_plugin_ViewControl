@@ -123,7 +123,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <AdditionalIncludeDirectories>$(BOOSTPATH);$(SXSDKINCLUDEPATH);$(SXSDKINCLUDEPATH)/openexr-1.6.1;$(SXSDKINCLUDEPATH)/opengl</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>SXWINDOWS;SXWIN32;DEMO_PLUGIN=0;NDEBUG;sxdebug=0;WIN32;_WINDOWS;Windows=1;PLUGIN=1;STDCALL=__stdcall;DLLEXPORT=__declspec(dllexport);_CRT_SECURE_NO_DEPRECATE;SXPLUGIN=1;_SECURE_SCL=0;PLUGIN_EXPORTS;SXCORE=;SXMODEL=;FBXSDK_NEW_API;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SXWINDOWS;SXWIN32;DEMO_PLUGIN=0;NDEBUG;sxdebug=0;WIN32;_WINDOWS;Windows=1;PLUGIN=1;STDCALL=__stdcall;DLLEXPORT=__declspec(dllexport);_CRT_SECURE_NO_DEPRECATE;SXPLUGIN=1;_SECURE_SCL=0;PLUGIN_EXPORTS;SXCORE=;SXMODEL=;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -146,7 +146,7 @@
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>../fbx_sdk_2015_1/lib/vs2013/x86/release/;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>
       </ModuleDefinitionFile>
       <ProgramDatabaseFile>.\$(Configuration)\$(Platform)\$(Configuration).pdb</ProgramDatabaseFile>
@@ -214,7 +214,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(BOOSTPATH);$(SXSDKINCLUDEPATH);$(SXSDKINCLUDEPATH)/openexr-1.6.1;$(SXSDKINCLUDEPATH)/opengl</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>SXWINDOWS;SXWIN32;DEMO_PLUGIN=0;DEBUG;sxdebug=0;WIN32;_WINDOWS;Windows=1;PLUGIN=1;STDCALL=__stdcall;DLLEXPORT=__declspec(dllexport);_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;SXPLUGIN=1;PLUGIN_EXPORTS;SXCORE=;SXMODEL=;FBXSDK_NEW_API;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SXWINDOWS;SXWIN32;DEMO_PLUGIN=0;DEBUG;sxdebug=0;WIN32;_WINDOWS;Windows=1;PLUGIN=1;STDCALL=__stdcall;DLLEXPORT=__declspec(dllexport);_CRT_SECURE_NO_DEPRECATE;_SECURE_SCL=0;SXPLUGIN=1;PLUGIN_EXPORTS;SXCORE=;SXMODEL=;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
