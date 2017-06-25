@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <strings>
-	<string id="product_name" value="ビューコントロール"/>
+	<string id="product_name" value="View Control"/>
 	<string id="author" value="ft-lab."/>
 	<string id="company" value="ft-lab."/>
-	<string id="comments" value="透視図の移動/回転/ズームを行います。"/>
+	<string id="comments" value="Move/Rotate/Zoom in perspective view."/>
 
-	<string id="title" value="ビューコントロール"/>
+	<string id="title" value="View Control"/>
 </strings>
