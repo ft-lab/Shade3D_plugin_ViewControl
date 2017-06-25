@@ -613,12 +613,12 @@ sxsdk::vec3 CControlWindowInterface::m_GetCameraDirection (const ViewControlPara
 
 	case ViewControlParam::view_top:
 		// Y-up時は、少しずらす.
-		cameraDir = normalize(sxsdk::vec3(0.001f, -1, 0));
+		cameraDir = normalize(sxsdk::vec3(0.01f, -1, 0));
 		break;
 
 	case ViewControlParam::view_bottom:
 		// Y-up時は、少しずらす.
-		cameraDir = normalize(sxsdk::vec3(0.001f, 1, 0));
+		cameraDir = normalize(sxsdk::vec3(0.01f, 1, 0));
 		break;
 
 	case ViewControlParam::view_left:
@@ -671,6 +671,26 @@ void CControlWindowInterface::m_ChangeCameraDirection (const ViewControlParam::C
 		sxsdk::camera_class& camera = scene->get_camera();
 
 		SetCameraWorldPos(newCameraPos);
+
+		// カメラの視線を中心に90度傾いている場合は、補正.
+		if (m_param.viewType == ViewControlParam::view_top || m_param.viewType == ViewControlParam::view_bottom) {
+			const sxsdk::vec3 tX = (m_param.viewType == ViewControlParam::view_top) ? sxsdk::vec3(-1, 0, 0) : sxsdk::vec3(1, 0, 0);
+
+			// X軸方向をビュー座標変換し、ビュー座標系でX軸を向いていない場合は回転させる.
+			const float fAngleMax = 0.9999f;
+			const sxsdk::mat4 wvMat = camera.get_world_to_view_matrix();
+			const sxsdk::vec4 v4 = sxsdk::vec4(tX, 0) * wvMat;
+			const sxsdk::vec3 vX = normalize(sxsdk::vec3(v4.x, v4.y, v4.z));
+			float rotV = 0.0f;
+			const float angleV = sx::inner_product(vX, tX);
+			if (std::abs(angleV) < fAngleMax) {
+				const sxsdk::mat4 rM = sxsdk::mat4::rotate(vX, sxsdk::vec3(1, 0, 0));
+				sxsdk::vec3 scale, shear, rotate, trans;
+				rM.unmatrix(scale, shear, rotate, trans);
+				rotV = rotate.z;
+			}
+			camera.rotate_eye(rotV);
+		}
 		m_param.cameraEyePos    = GetCameraWorldPos();
 		m_param.cameraTargetPos = GetCameraTargetWorldPos();
 
@@ -685,7 +705,7 @@ void CControlWindowInterface::m_ChangeCameraDirection (const ViewControlParam::C
 ViewControlParam::CameraViewType CControlWindowInterface::m_GetCameraViewType ()
 {
 	ViewControlParam::CameraViewType viewType = ViewControlParam::view_perspective;
-	const float chkAngle = 0.9999f;
+	const float chkAngle = 0.999f;
 	try {
 		compointer<sxsdk::scene_interface> scene(shade.get_scene_interface());
 		if (!scene) return viewType;
