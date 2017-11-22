@@ -3,6 +3,16 @@
 	<vbox>
 		<control size='2 30'/>
 		<control size='200 4'/>
+		<hbox>
+			<static-text id="move_scale_label" label="Move Scale" size="80 16" />
+			<checkbox id="move_scale_0_5" label=" 0.5 " push="true" />
+			<checkbox id="move_scale_1_0" label=" 1.0 " push="true" />
+			<checkbox id="move_scale_1_5" label=" 1.5 " push="true" />
+			<checkbox id="move_scale_2_0" label=" 2.0 " push="true" />
+			<checkbox id="move_scale_2_5" label=" 2.5 " push="true" />
+			<checkbox id="move_scale_3_0" label=" 3.0 " push="true" />
+		</hbox>
+		<control size='200 4'/>
 		<popup-menu id="view_type" label="Orientation of camera">
 			<item id="popup_item_0" label="Perspective View"/>
 			<item id="popup_item_1" label="Top View"/>

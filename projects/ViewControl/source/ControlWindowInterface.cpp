@@ -167,7 +167,7 @@ void CWindowIcon::m_moveCamera (const sx::vec<int,2>& dV)
 		//const sx::vec<int,2> screenSize = m_pParent->GetPersViewSize(scene);
 
 		// スクリーン上で、Xが+1移動するときのワールド座標での移動量.
-		const float ddScale = 10.0f;
+		const float ddScale = 10.0f * (m_pParent->GetMoveScale());
 		sxsdk::vec3 dVx(0, 0, 0);
 		{
 			sxsdk::vec4 vA(0, 0, 0, nearPlaneDist);
@@ -492,6 +492,31 @@ bool CControlWindowInterface::setup_checkbox (sxsdk::window_interface::checkbox_
 		return true;
 	}
 
+	if (idName == "move_scale_0_5") {
+		checkbox.set_value(m_param.moveScale == ViewControlParam::move_scale_0_5);
+		return true;
+	}
+	if (idName == "move_scale_1_0") {
+		checkbox.set_value(m_param.moveScale == ViewControlParam::move_scale_1_0);
+		return true;
+	}
+	if (idName == "move_scale_1_5") {
+		checkbox.set_value(m_param.moveScale == ViewControlParam::move_scale_1_5);
+		return true;
+	}
+	if (idName == "move_scale_2_0") {
+		checkbox.set_value(m_param.moveScale == ViewControlParam::move_scale_2_0);
+		return true;
+	}
+	if (idName == "move_scale_2_5") {
+		checkbox.set_value(m_param.moveScale == ViewControlParam::move_scale_2_5);
+		return true;
+	}
+	if (idName == "move_scale_3_0") {
+		checkbox.set_value(m_param.moveScale == ViewControlParam::move_scale_3_0);
+		return true;
+	}
+
 	return false;
 }
 
@@ -541,6 +566,37 @@ void CControlWindowInterface::checkbox_value_changed (sxsdk::window_interface::c
 	const std::string idName = checkbox.get_control_idname();
 	if (idName == "view_boundingbox") {
 		m_SetShowBoundingBox((checkbox.get_value() != 0) ? true : false);
+	}
+
+	if (idName == "move_scale_0_5") {
+		m_param.moveScale = ViewControlParam::move_scale_0_5;
+		this->obsolete();
+		return;
+	}
+	if (idName == "move_scale_1_0") {
+		m_param.moveScale = ViewControlParam::move_scale_1_0;
+		this->obsolete();
+		return;
+	}
+	if (idName == "move_scale_1_5") {
+		m_param.moveScale = ViewControlParam::move_scale_1_5;
+		this->obsolete();
+		return;
+	}
+	if (idName == "move_scale_2_0") {
+		m_param.moveScale = ViewControlParam::move_scale_2_0;
+		this->obsolete();
+		return;
+	}
+	if (idName == "move_scale_2_5") {
+		m_param.moveScale = ViewControlParam::move_scale_2_5;
+		this->obsolete();
+		return;
+	}
+	if (idName == "move_scale_3_0") {
+		m_param.moveScale = ViewControlParam::move_scale_3_0;
+		this->obsolete();
+		return;
 	}
 }
 
@@ -1021,4 +1077,32 @@ sx::vec<int,2> CControlWindowInterface::GetPersViewSize (sxsdk::scene_interface*
 		size = rect.size();
 	} catch (...) { }
 	return size;
+}
+
+/**
+ * 平行移動量を取得.
+ */
+float CControlWindowInterface::GetMoveScale ()
+{
+	switch (m_param.moveScale) {
+	case ViewControlParam::move_scale_0_5:
+		return 0.5f;
+		break;
+	case ViewControlParam::move_scale_1_0:
+		return 1.0f;
+		break;
+	case ViewControlParam::move_scale_1_5:
+		return 1.5f;
+		break;
+	case ViewControlParam::move_scale_2_0:
+		return 2.0f;
+		break;
+	case ViewControlParam::move_scale_2_5:
+		return 2.5f;
+		break;
+	case ViewControlParam::move_scale_3_0:
+		return 3.0f;
+		break;
+	}
+	return 1.0f;
 }

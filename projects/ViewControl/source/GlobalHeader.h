@@ -39,6 +39,18 @@ namespace ViewControlParam {
 		view_display_type_texture_wireframe,		// テクスチャ + ワイヤーフレーム.
 		view_display_type_preview_rendering,		// プレビューレンダリング.
 	};
+
+	/**
+	 * 平行移動量.
+	 */
+	enum MoveScaleType {
+		move_scale_0_5 = 0,				// 0.5.
+		move_scale_1_0,					// 1.0.
+		move_scale_1_5,					// 1.5.
+		move_scale_2_0,					// 2.0.
+		move_scale_2_5,					// 2.5.
+		move_scale_3_0,					// 3.0.
+	};
 }
 
 /**
@@ -52,6 +64,7 @@ public:
 	sxsdk::vec3 cameraTargetPos;							// カメラの注視点位置.
 	ViewControlParam::ViewDisplayType viewDisplayType;		// ビューでの表示の種類.
 	bool showBoundingBox;									// バウンディングボックス表示.
+	ViewControlParam::MoveScaleType moveScale;				// 平行移動量 (0.5  1.0  1.5  2.0  2.5  3.0).
 
 public:
 	CControlParam () {
@@ -64,6 +77,7 @@ public:
 		cameraTargetPos = sxsdk::vec3(0, 0, 0);
 		viewDisplayType = ViewControlParam::view_display_type_texture_wireframe;
 		showBoundingBox = true;
+		moveScale = ViewControlParam::move_scale_1_0;
 	}
 };
 

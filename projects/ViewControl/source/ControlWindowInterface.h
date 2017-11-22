@@ -238,6 +238,11 @@ public:
 	 * 透視図での、図形ウィンドウとしての描画サイズを取得.
 	 */
 	sx::vec<int,2> GetPersViewSize (sxsdk::scene_interface* scene);
+
+	/**
+	 * 平行移動量を取得.
+	 */
+	float GetMoveScale ();
 }; 
 
 #endif
