@@ -682,7 +682,9 @@ void CControlWindowInterface::SetCameraWorldPos (const sxsdk::vec3& wPos)
 		camera.set_eye(wPos * inv(lwMat));
 #if _WINDOWS
 #else
-		scene->force_update();	// 強制再描画.
+		if (shade.get_version() < 500000) {		// ver.16まで.
+			scene->force_update();	// 強制再描画.
+		}
 #endif
 	} catch (...) { }
 }
@@ -704,7 +706,9 @@ void CControlWindowInterface::SetCameraTargetWorldPos (const sxsdk::vec3& wPos)
 		camera.set_target(wPos * inv(lwMat));
 #if _WINDOWS
 #else
-		scene->force_update();	// 強制再描画.
+		if (shade.get_version() < 500000) {		// ver.16まで.
+			scene->force_update();	// 強制再描画.
+		}
 #endif
 	} catch (...) { }
 }
