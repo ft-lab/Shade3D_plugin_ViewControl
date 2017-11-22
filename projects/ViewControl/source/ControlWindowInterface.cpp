@@ -163,6 +163,9 @@ void CWindowIcon::m_moveCamera (const sx::vec<int,2>& dV)
 			nearPlaneDist = v4.w - v4.z;
 		}
 
+		// 図形ウィンドウ上のスクリーンのサイズ.
+		//const sx::vec<int,2> screenSize = m_pParent->GetPersViewSize(scene);
+
 		// スクリーン上で、Xが+1移動するときのワールド座標での移動量.
 		const float ddScale = 10.0f;
 		sxsdk::vec3 dVx(0, 0, 0);
@@ -373,9 +376,14 @@ void CControlWindowInterface::idle (void *)
 	if (diffTimeMS > chkMS) {
 		const sxsdk::vec3 cPos       = GetCameraWorldPos();
 		const sxsdk::vec3 cTargetPos = GetCameraTargetWorldPos();
-		if (!sx::zero(cPos - m_param.cameraEyePos) || !sx::zero(cTargetPos - m_param.cameraTargetPos)) {
+		const ViewControlParam::ViewDisplayType dType = m_GetViewDisplayType();
+		const bool showBoundingBox   = m_GetShowBoundingBox();
+		if (!sx::zero(cPos - m_param.cameraEyePos) || !sx::zero(cTargetPos - m_param.cameraTargetPos) ||
+			dType != m_param.viewDisplayType || showBoundingBox != m_param.showBoundingBox) {
 			m_param.cameraEyePos    = cPos;
 			m_param.cameraTargetPos = cTargetPos;
+			m_param.viewDisplayType = dType;
+			m_param.showBoundingBox = showBoundingBox;
 
 			// 視線向きのUI表示を更新.
 			m_param.viewType = m_GetCameraViewType();
@@ -462,6 +470,28 @@ bool CControlWindowInterface::setup_popup_menu (sxsdk::window_interface::popup_m
 		popup_menu.set_value((int)m_param.viewType);
 		return true;
 	}
+
+	if (idName == "view_show_type") {
+		m_param.viewDisplayType = m_GetViewDisplayType();
+		popup_menu.set_value((int)m_param.viewDisplayType);
+		return true;
+	}
+
+	return false;
+}
+
+bool CControlWindowInterface::setup_checkbox (sxsdk::window_interface::checkbox_class &checkbox, void *)
+{
+	checkbox.set_active(IsSceneActive());
+	if (!this->is_shown()) return false;
+
+	const std::string idName = checkbox.get_control_idname();
+	if (idName == "view_boundingbox") {
+		m_param.showBoundingBox = m_GetShowBoundingBox();
+		checkbox.set_value(m_param.showBoundingBox ? 1 : 0);
+		return true;
+	}
+
 	return false;
 }
 
@@ -491,6 +521,26 @@ void CControlWindowInterface::popup_menu_value_changed (sxsdk::window_interface:
 		m_pMoveIcon->obsolete();
 		m_pRotateIcon->obsolete();
 		m_pZoomIcon->obsolete();
+	}
+
+	if (idName == "view_show_type") {
+		// 表示の種類を変更.
+		m_ChangeViewDisplayType((ViewControlParam::ViewDisplayType)(popup_menu.get_value()));
+
+		// 各種ボタンが消えるので再描画を促す.
+		m_pMoveIcon->obsolete();
+		m_pRotateIcon->obsolete();
+		m_pZoomIcon->obsolete();
+	}
+}
+
+void CControlWindowInterface::checkbox_value_changed (sxsdk::window_interface::checkbox_class &checkbox, void *)
+{
+	if (!IsSceneActive()) return;
+
+	const std::string idName = checkbox.get_control_idname();
+	if (idName == "view_boundingbox") {
+		m_SetShowBoundingBox((checkbox.get_value() != 0) ? true : false);
 	}
 }
 
@@ -777,4 +827,198 @@ ViewControlParam::CameraViewType CControlWindowInterface::m_GetCameraViewType ()
 	return viewType;
 }
 
+/**
+ * 透視図が表示されているViewPaneを取得.
+ */
+int CControlWindowInterface::m_GetPerspectiveViewPane ()
+{
+	try {
+		compointer<sxsdk::scene_interface> scene(shade.get_scene_interface());
+		if (!scene) return -1;
+		return m_GetPerspectiveViewPane(scene);
+	} catch (...) { }
 
+	return -1;
+}
+int CControlWindowInterface::m_GetPerspectiveViewPane (sxsdk::scene_interface* scene)
+{
+	int viewPane = -1;
+	try {
+		compointer<sxsdk::display_interface> display(scene->get_display_interface());
+		if (!display) return viewPane;
+
+		// 「透視図」が選択されているViewpaneを取得.
+		for (int i = 0; i < 4; ++i) {
+			const int cameraType  = display->get_camera_type(i);		// 3が透視図、8がオブジェクトカメラ、9がメタカメラ.
+			if (cameraType == 3) {
+				viewPane = i;
+				break;
+			}
+		}
+		if (viewPane >= 0) return viewPane;
+
+		// 「メタカメラ」または「オブジェクトカメラ」が選択されているViewpaneを取得.
+		for (int i = 0; i < 4; ++i) {
+			const int cameraType  = display->get_camera_type(i);
+			if (cameraType == 8 || cameraType == 9) {
+				viewPane = i;
+				break;
+			}
+		}
+		if (viewPane >= 0) return viewPane;
+
+	} catch (...) { }
+
+	return viewPane;
+}
+
+/**
+ * ビューでの表示の種類を取得.
+ */
+ViewControlParam::ViewDisplayType CControlWindowInterface::m_GetViewDisplayType ()
+{
+	ViewControlParam::ViewDisplayType vDisplayType = ViewControlParam::view_display_type_texture_wireframe;
+
+	// 4面図のうち、透視図のViewpaneを取得.
+	const int currentViewPane = m_GetPerspectiveViewPane();
+	if (currentViewPane < 0) return vDisplayType;
+
+	try {
+		compointer<sxsdk::scene_interface> scene(shade.get_scene_interface());
+		if (!scene) return vDisplayType;
+		compointer<sxsdk::display_interface> display(scene->get_display_interface());
+		if (!display) return vDisplayType;
+
+		// currentViewPaneでのシェーディングの種類を取得.
+		const int shadingMode = display->get_shading_mode(currentViewPane);
+		switch (shadingMode) {
+		case 0:
+			vDisplayType = ViewControlParam::view_display_type_wireframe;
+			break;
+		case 1:
+			vDisplayType = ViewControlParam::view_display_type_wireframe_hidden_line;
+			break;
+		case 2:
+			vDisplayType = ViewControlParam::view_display_type_shading;
+			break;
+		case 3:
+			vDisplayType = ViewControlParam::view_display_type_shading_wireframe;
+			break;
+		case 4:
+			vDisplayType = ViewControlParam::view_display_type_texture;
+			break;
+		case 5:
+			vDisplayType = ViewControlParam::view_display_type_texture_wireframe;
+			break;
+		case 7:
+			vDisplayType = ViewControlParam::view_display_type_preview_rendering;
+			break;
+		}
+
+	} catch (...) { }
+	return vDisplayType;
+}
+
+/**
+ * ViewControlParam::ViewDisplayTypeからShade3Dでのshading_modeに変換.
+ */
+int CControlWindowInterface::m_DisplayTypeToShadingMode (const ViewControlParam::ViewDisplayType displayType) {
+	switch (displayType) {
+	case ViewControlParam::view_display_type_wireframe:
+		return 0;
+	case ViewControlParam::view_display_type_wireframe_hidden_line:
+		return 1;
+	case ViewControlParam::view_display_type_shading:
+		return 2;
+	case ViewControlParam::view_display_type_shading_wireframe:
+		return 3;
+	case ViewControlParam::view_display_type_texture:
+		return 4;
+	case ViewControlParam::view_display_type_texture_wireframe:
+		return 5;
+	case ViewControlParam::view_display_type_preview_rendering:
+		return 7;
+	}
+	return 0;
+}
+
+/**
+ * ビューでの表示の種類を変更.
+ */
+void CControlWindowInterface::m_ChangeViewDisplayType (const ViewControlParam::ViewDisplayType viewDisplayType)
+{
+	m_param.viewDisplayType = viewDisplayType;
+
+	// 4面図のうち、透視図のViewpaneを取得.
+	const int currentViewPane = m_GetPerspectiveViewPane();
+	if (currentViewPane < 0) return;
+
+	try {
+		compointer<sxsdk::scene_interface> scene(shade.get_scene_interface());
+		if (!scene) return;
+		compointer<sxsdk::display_interface> display(scene->get_display_interface());
+		if (!display) return;
+
+		display->set_shading_mode(currentViewPane, m_DisplayTypeToShadingMode(viewDisplayType));
+	} catch (...) { }
+}
+
+/**
+ * 透視図での、バウンディングボックス表示のOn/Offを取得.
+ */
+bool CControlWindowInterface::m_GetShowBoundingBox ()
+{
+	// 4面図のうち、透視図のViewpaneを取得.
+	const int currentViewPane = m_GetPerspectiveViewPane();
+	if (currentViewPane < 0) return false;
+
+	try {
+		compointer<sxsdk::scene_interface> scene(shade.get_scene_interface());
+		if (!scene) return false;
+		compointer<sxsdk::display_interface> display(scene->get_display_interface());
+		if (!display) return false;
+
+		return display->get_show_bbox(currentViewPane);
+	} catch (...) { }
+
+	return false;
+}
+
+/**
+ * 透視図での、バウンディングボックス表示のOn/Offを指定.
+ */
+void CControlWindowInterface::m_SetShowBoundingBox (const bool showBBox)
+{
+	// 4面図のうち、透視図のViewpaneを取得.
+	const int currentViewPane = m_GetPerspectiveViewPane();
+	if (currentViewPane < 0) return;
+
+	m_param.showBoundingBox = showBBox;
+
+	try {
+		compointer<sxsdk::scene_interface> scene(shade.get_scene_interface());
+		if (!scene) return;
+		compointer<sxsdk::display_interface> display(scene->get_display_interface());
+		if (!display) return;
+
+		display->set_show_bbox(currentViewPane, showBBox);
+	} catch (...) { }
+}
+
+/**
+ * 透視図での、図形ウィンドウとしての描画サイズを取得.
+ */
+sx::vec<int,2> CControlWindowInterface::GetPersViewSize (sxsdk::scene_interface* scene)
+{
+	sx::vec<int,2> size(640, 480);
+
+	// 4面図のうち、透視図のViewpaneを取得.
+	const int currentViewPane = m_GetPerspectiveViewPane();
+	if (currentViewPane < 0) return size;
+
+	try {
+		sx::rectangle_class rect = scene->get_view_rectangle(currentViewPane);
+		size = rect.size();
+	} catch (...) { }
+	return size;
+}

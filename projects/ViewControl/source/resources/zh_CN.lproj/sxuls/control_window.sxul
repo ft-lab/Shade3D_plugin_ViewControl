@@ -24,5 +24,19 @@
 			<static-text id="camera_target_label" label="Camera Target" size="80 16" />
 			<static-text id="camera_target" label="dummy (xxxxxxxxx, xxxxxxxxx, xxxxxxxxx)" />
 		</hbox>
+
+		<control size='200 8'/>
+		<popup-menu id="view_show_type" label="View">
+			<item id="popup_view_show_item_0" label="Wireframe"/>
+			<item id="popup_view_show_item_1" label="Wireframe (Hidden line)"/>
+			<item id="popup_view_show_item_2" label="Shading"/>
+			<item id="popup_view_show_item_3" label="Shading + Wireframe"/>
+			<item id="popup_view_show_item_4" label="Texture"/>
+			<item id="popup_view_show_item_5" label="Texture + Wireframe"/>
+			<item id="popup_view_show_item_6" label="Preview Rendering"/>
+		</popup-menu>
+		<control size='200 4'/>
+		<checkbox id="view_boundingbox" label="Show Bounding Box" />		
+		<control size='200 4'/>
 	</vbox>
 </palette>

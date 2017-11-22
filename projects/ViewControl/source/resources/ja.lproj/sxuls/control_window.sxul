@@ -24,5 +24,19 @@
 			<static-text id="camera_target_label" label="カメラ注視点" size="80 16" />
 			<static-text id="camera_target" label="dummy (xxxxxxxxx, xxxxxxxxx, xxxxxxxxx)" />
 		</hbox>
+
+		<control size='200 8'/>
+		<popup-menu id="view_show_type" label="ビュー表示">
+			<item id="popup_view_show_item_0" label="ワイヤーフレーム"/>
+			<item id="popup_view_show_item_1" label="ワイヤーフレーム (陰線消去)"/>
+			<item id="popup_view_show_item_2" label="シェーディング"/>
+			<item id="popup_view_show_item_3" label="シェーディング + ワイヤーフレーム"/>
+			<item id="popup_view_show_item_4" label="テクスチャ"/>
+			<item id="popup_view_show_item_5" label="テクスチャ + ワイヤーフレーム"/>
+			<item id="popup_view_show_item_6" label="プレビューレンダリング"/>
+		</popup-menu>
+		<control size='200 4'/>
+		<checkbox id="view_boundingbox" label="バウンディングボックス表示" />		
+		<control size='200 4'/>
 	</vbox>
 </palette>

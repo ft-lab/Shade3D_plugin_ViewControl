@@ -142,12 +142,14 @@ private:
 	virtual bool setup_static_text (sxsdk::window_interface::static_text_class &static_text, void *aux=0);
 	virtual bool setup_push_button (sxsdk::window_interface::push_button_class &push_button, void *aux=0);
 	virtual bool setup_popup_menu (sxsdk::window_interface::popup_menu_class &popup_menu, void *aux=0);
+	virtual bool setup_checkbox (sxsdk::window_interface::checkbox_class &checkbox, void *aux=0);
 
 	//------------------------------------------.
 	// イベント処理のコールバック.
 	//------------------------------------------.
 	virtual void push_button_clicked (sxsdk::window_interface::push_button_class& push_button, void* aux = 0);
 	virtual void popup_menu_value_changed (sxsdk::window_interface::popup_menu_class& popup_menu, void* aux = 0);
+	virtual void checkbox_value_changed (sxsdk::window_interface::checkbox_class &checkbox, void *aux=0);
 
 private:
 	/**
@@ -169,6 +171,37 @@ private:
 	 * 視線の向きより、正面や側面、透視図の判断.
 	 */
 	ViewControlParam::CameraViewType m_GetCameraViewType ();
+
+	/**
+	 * ビューでの表示の種類を変更.
+	 */
+	void m_ChangeViewDisplayType (const ViewControlParam::ViewDisplayType viewDisplayType);
+
+	/**
+	 * ビューでの表示の種類を取得.
+	 */
+	ViewControlParam::ViewDisplayType m_GetViewDisplayType ();
+
+	/**
+	 * 透視図が表示されているViewPaneを取得.
+	 */
+	int m_GetPerspectiveViewPane ();
+	int m_GetPerspectiveViewPane (sxsdk::scene_interface* scene);
+
+	/**
+	 * ViewControlParam::ViewDisplayTypeからShade3Dでのshading_modeに変換.
+	 */
+	int m_DisplayTypeToShadingMode (const ViewControlParam::ViewDisplayType displayType);
+
+	/**
+	 * 透視図での、バウンディングボックス表示のOn/Offを取得.
+	 */
+	bool m_GetShowBoundingBox ();
+
+	/**
+	 * 透視図での、バウンディングボックス表示のOn/Offを指定.
+	 */
+	void m_SetShowBoundingBox (const bool showBBox);
 
 public:
 	explicit CControlWindowInterface (sxsdk::shade_interface &shade);
@@ -200,6 +233,11 @@ public:
 	 * カメラの注視点のワールド座標位置を指定.
 	 */
 	void SetCameraTargetWorldPos (const sxsdk::vec3& wPos);
+
+	/**
+	 * 透視図での、図形ウィンドウとしての描画サイズを取得.
+	 */
+	sx::vec<int,2> GetPersViewSize (sxsdk::scene_interface* scene);
 }; 
 
 #endif

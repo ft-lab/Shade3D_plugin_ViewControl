@@ -26,6 +26,19 @@ namespace ViewControlParam {
 		view_right,					// 右面図.
 		view_left,					// 左面図.
 	};
+
+	/**
+	 * ビューでの表示の種類.
+	 */
+	enum ViewDisplayType {
+		view_display_type_wireframe = 0,			// ワイヤーフレーム.
+		view_display_type_wireframe_hidden_line,	// ワイヤーフレーム (陰線消去).
+		view_display_type_shading,					// シェーディング.
+		view_display_type_shading_wireframe,		// シェーディング + ワイヤーフレーム.
+		view_display_type_texture,					// テクスチャ.
+		view_display_type_texture_wireframe,		// テクスチャ + ワイヤーフレーム.
+		view_display_type_preview_rendering,		// プレビューレンダリング.
+	};
 }
 
 /**
@@ -34,9 +47,11 @@ namespace ViewControlParam {
 class CControlParam
 {
 public:
-	ViewControlParam::CameraViewType viewType;		// カメラの向き.
-	sxsdk::vec3 cameraEyePos;						// カメラの視点位置.
-	sxsdk::vec3 cameraTargetPos;					// カメラの注視点位置.
+	ViewControlParam::CameraViewType viewType;				// カメラの向き.
+	sxsdk::vec3 cameraEyePos;								// カメラの視点位置.
+	sxsdk::vec3 cameraTargetPos;							// カメラの注視点位置.
+	ViewControlParam::ViewDisplayType viewDisplayType;		// ビューでの表示の種類.
+	bool showBoundingBox;									// バウンディングボックス表示.
 
 public:
 	CControlParam () {
@@ -47,6 +62,8 @@ public:
 		viewType = ViewControlParam::view_perspective;
 		cameraEyePos    = sxsdk::vec3(0, 0, 0);
 		cameraTargetPos = sxsdk::vec3(0, 0, 0);
+		viewDisplayType = ViewControlParam::view_display_type_texture_wireframe;
+		showBoundingBox = true;
 	}
 };
 
