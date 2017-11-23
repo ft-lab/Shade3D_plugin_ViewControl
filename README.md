@@ -11,6 +11,11 @@
 * Mac 10.9以降のOS
 * Shade3D ver.15/16以降で、Standard/Professional版（Basic版では動作しません）
 
+## プラグインダウンロード
+以下から最新版をダウンロードしてください。  
+https://github.com/ft-lab/Shade3D_plugin_ViewControl/releases
+
+
 ## ソースのビルド (開発向け)
 WindowsはVisual Studio 2013を使用。  
 MacはXcode 6.4を使用。  
@@ -73,6 +78,9 @@ Xcode6.xで、ViewControl/mac/plugins/Template.xcodeprojを読み込みビルド
 * カメラが平行投影の場合は、移動と回転の動きが速すぎる問題。
 
 ## 更新履歴
+
+[2017/11/23]  ver.1.1.1.0  
+* カメラが真上または真下を向く際に、回転時に方向転換されないように調整
 
 [2017/11/22]  ver.1.1.0.0  
 * 「平行移動量」の倍率指定により、移動時の速度調整ができるようにした
