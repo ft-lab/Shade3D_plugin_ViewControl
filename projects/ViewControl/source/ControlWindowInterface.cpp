@@ -267,9 +267,19 @@ void CWindowIcon::m_rotateCamera (const sx::vec<int,2>& dV)
 			sxsdk::vec3 dd = ((dV.x * dVx) + (dV.y * dVy)) * scale2;
 
 			sxsdk::vec3 newEyePos = eyePos - dd;
-			const sxsdk::vec3 eyeDir2 = normalize(newEyePos - targetPos);
+			sxsdk::vec3 eyeDir2 = normalize(newEyePos - targetPos);
 			if (sx::inner_product(eyeDir, eyeDir2) < 0.0f) return;
-			if (std::abs(eyeDir2.y) > 0.999f) return;		// 真上真下を向くと反転するのを防ぐ.
+
+			// 真上真下を向くと反転するのを防ぐ.
+			const float prevMaxAngle = 0.995f;
+			if (std::abs(eyeDir.y) < prevMaxAngle) {
+				const float maxAngle = 0.99f;
+				if (std::abs(eyeDir2.y) > maxAngle) return;
+			}
+			if (std::abs(eyeDir2.y) > prevMaxAngle) {
+				eyeDir2.x += 0.1f;
+				eyeDir2 = normalize(eyeDir2);
+			}
 
 			newEyePos = (eyeDir2 * eyeTargetDist) + targetPos;
 
