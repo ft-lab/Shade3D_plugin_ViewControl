@@ -52,6 +52,11 @@ private:
 
 private:
 	/**
+	 * レンダリング画像サイズと透視図上のサイズより、スケール値を取得.
+	 */
+	float m_calcRScale (sxsdk::scene_interface* scene);
+
+	/**
 	 * 移動処理.
 	 * @param[in] dV   ドラッグでの移動量.
 	 */

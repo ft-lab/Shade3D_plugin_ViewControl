@@ -128,6 +128,27 @@ void CWindowIcon::mouseRelease ()
 }
 
 /**
+ * レンダリング画像サイズと透視図上のサイズより、スケール値を取得.
+ */
+float CWindowIcon::m_calcRScale (sxsdk::scene_interface* scene)
+{
+	// 図形ウィンドウ上のスクリーンのサイズ.
+	const sx::vec<int,2> screenSize = m_pParent->GetPersViewSize(scene);
+
+	// レンダリング画像サイズ.
+	sx::vec<int,2> renderingSize = screenSize;
+	try {
+		compointer<sxsdk::rendering_interface> rendering(scene->get_rendering_interface());
+		if (rendering) {
+			renderingSize = rendering->get_image_size();
+		}
+	} catch (...) { }
+
+	const float rScale = std::max(1.0f, (float)renderingSize.x) / std::max(1.0f, (float)screenSize.x);
+	return rScale;
+}
+
+/**
  * 移動処理.
  * @param[in] dV   ドラッグでの移動量.
  */
@@ -163,11 +184,11 @@ void CWindowIcon::m_moveCamera (const sx::vec<int,2>& dV)
 			nearPlaneDist = v4.w - v4.z;
 		}
 
-		// 図形ウィンドウ上のスクリーンのサイズ.
-		//const sx::vec<int,2> screenSize = m_pParent->GetPersViewSize(scene);
+		// レンダリング画像サイズが大きい場合は移動量が小さくなってしまうため、拡大率をレンダリング画像サイズから計算.
+		const float rScale = m_calcRScale(scene);
 
 		// スクリーン上で、Xが+1移動するときのワールド座標での移動量.
-		const float ddScale = 10.0f * (m_pParent->GetMoveScale());
+		const float ddScale = 10.0f * (m_pParent->GetMoveScale()) * rScale;
 		sxsdk::vec3 dVx(0, 0, 0);
 		{
 			sxsdk::vec4 vA(0, 0, 0, nearPlaneDist);
@@ -238,8 +259,11 @@ void CWindowIcon::m_rotateCamera (const sx::vec<int,2>& dV)
 			nearPlaneDist = v4.w - v4.z;
 		}
 
+		// レンダリング画像サイズが大きい場合は移動量が小さくなってしまうため、拡大率をレンダリング画像サイズから計算.
+		const float rScale = m_calcRScale(scene);
+
 		// スクリーン上で、Xが+1移動するときのワールド座標での移動量.
-		const float ddScale = 10.0f;
+		const float ddScale = 10.0f * rScale;
 		sxsdk::vec3 dVx(0, 0, 0);
 		{
 			sxsdk::vec4 vA(0, 0, 0, nearPlaneDist);
