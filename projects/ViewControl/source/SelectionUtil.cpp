@@ -95,7 +95,7 @@ sxsdk::vec3 SelectionUtil::GetSelectionCenter (sxsdk::scene_interface* scene)
 				// ポリゴンメッシュが選択されている場合.
 				if (type == sxsdk::enums::polygon_mesh) {
 					sxsdk::polygon_mesh_class& pMesh = shape->get_polygon_mesh();
-					sxsdk::polygon_mesh_saver_class* pSaver = pMesh.get_polygon_mesh_saver();
+					const bool hasSkin = (pMesh.get_skin_type() >= 0) ? true : false;
 
 					// 頂点選択モードの場合.
 					if (selectionMode == sxsdk::enums::vertex_selection_mode) {
@@ -105,7 +105,8 @@ sxsdk::vec3 SelectionUtil::GetSelectionCenter (sxsdk::scene_interface* scene)
 							sxsdk::vertex_class& v = pMesh.vertex(j);
 							if (!v.get_active()) continue;
 
-							const sxsdk::vec3 p = pSaver->get_point(j) * lwMat;
+							const sxsdk::mat4 skin_m = hasSkin ? (v.get_skin().get_skin_world_matrix()) : lwMat;
+							const sxsdk::vec3 p = v.get_position() * skin_m;
 							pointsList.push_back(p);
 						}
 
@@ -121,7 +122,9 @@ sxsdk::vec3 SelectionUtil::GetSelectionCenter (sxsdk::scene_interface* scene)
 						}
 						if (!vIndexList.empty()) {
 							for (size_t j = 0; j < vIndexList.size(); ++j) {
-								const sxsdk::vec3 p = pSaver->get_point(vIndexList[j]) * lwMat;
+								sxsdk::vertex_class& v = pMesh.vertex(vIndexList[j]);
+								const sxsdk::mat4 skin_m = hasSkin ? (v.get_skin().get_skin_world_matrix()) : lwMat;
+								const sxsdk::vec3 p = v.get_position() * skin_m;
 								pointsList.push_back(p);
 							}
 						}
@@ -143,7 +146,9 @@ sxsdk::vec3 SelectionUtil::GetSelectionCenter (sxsdk::scene_interface* scene)
 						}
 						if (!vIndexList.empty()) {
 							for (size_t j = 0; j < vIndexList.size(); ++j) {
-								const sxsdk::vec3 p = pSaver->get_point(vIndexList[j]) * lwMat;
+								sxsdk::vertex_class& v = pMesh.vertex(vIndexList[j]);
+								const sxsdk::mat4 skin_m = hasSkin ? (v.get_skin().get_skin_world_matrix()) : lwMat;
+								const sxsdk::vec3 p = v.get_position() * skin_m;
 								pointsList.push_back(p);
 							}
 						}
